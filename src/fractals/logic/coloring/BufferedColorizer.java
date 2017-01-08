@@ -2,27 +2,24 @@ package fractals.logic.coloring;
 
 import java.awt.Color;
 import java.util.TreeMap;
-import java.util.logging.Logger;
 
 public class BufferedColorizer implements Colorizer {
-	
+
 	private final Colorizer colorizer;
-	
-	private TreeMap<Integer, Color> bufferedColors;
-	
-	private Logger log = Logger.getLogger(getClass().getSimpleName());
-	
+
+	private final TreeMap<Integer, Color> bufferedColors;
+
 	public BufferedColorizer(Colorizer colorizer) {
 		this.colorizer = colorizer;
 		this.bufferedColors = new TreeMap<>();
 	}
-	
+
 	private void generateColorsTo(int maxIters) {
 		int maxKey = 0;
 		if (bufferedColors.size() > 0) {
 			maxKey = bufferedColors.lastKey();
 		}
-		
+
 		for (int i = maxKey + 1; i <= maxIters; i++) {
 			bufferedColors.put(i, colorizer.getColorOf(i));
 		}
@@ -30,9 +27,9 @@ public class BufferedColorizer implements Colorizer {
 
 	@Override
 	public Color getColorOf(int iterNumber, float lastVal) {
-		Color c1 = getColorOf(iterNumber);
-		Color c2 = getColorOf(iterNumber + 1);
-		Color finalColor = getColorOfLastVal(c1, c2, lastVal);
+		final Color c1 = getColorOf(iterNumber);
+		final Color c2 = getColorOf(iterNumber + 1);
+		final Color finalColor = getColorOfLastVal(c1, c2, lastVal);
 		return finalColor;
 	}
 
@@ -41,13 +38,12 @@ public class BufferedColorizer implements Colorizer {
 		if (!bufferedColors.containsKey(iterNumber)) {
 			generateColorsTo(iterNumber);
 		}
-		
+
 		return bufferedColors.get(iterNumber);
 	}
 
 	@Override
-	public Color getColorOfLastVal(Color iterColor, Color iterNextColor,
-			float lastVal) {
+	public Color getColorOfLastVal(Color iterColor, Color iterNextColor, float lastVal) {
 		return colorizer.getColorOfLastVal(iterColor, iterNextColor, lastVal);
 	}
 
