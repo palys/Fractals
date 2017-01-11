@@ -52,6 +52,7 @@ public class FractalViewController {
 		colorChooser.getSelectionModel().selectFirst();
 
 		drawButton.setOnAction(e -> {
+			final long time = System.currentTimeMillis();
 			final String set = setChooser.getSelectionModel().getSelectedItem();
 			final String color = colorChooser.getSelectionModel().getSelectedItem();
 			final EquationFactory factory = factory(set);
@@ -59,6 +60,7 @@ public class FractalViewController {
 			fractalCanvas.setWidth(fractalCanvas.getParent().getBoundsInLocal().getWidth());
 			fractalCanvas.setHeight(fractalCanvas.getParent().getBoundsInLocal().getHeight());
 			new FractalDrawer(colorizer, computingService, factory).draw(fractalCanvas.getGraphicsContext2D());
+			System.out.println("Overal: " + (System.currentTimeMillis() - time) + "ms.");
 		});
 	}
 
