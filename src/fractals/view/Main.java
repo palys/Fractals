@@ -43,7 +43,7 @@ public class Main extends Application {
 	public void showFractals() {
 		try {
 			final FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(Main.class.getResource("/view/FractalsWindow.fxml"));
+			loader.setLocation(Main.class.getResource("/view/FractalView.fxml"));
 			final AnchorPane personOverview = (AnchorPane) loader.load();
 			rootLayout.setCenter(personOverview);
 		} catch (final IOException e) {
