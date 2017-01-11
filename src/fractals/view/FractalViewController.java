@@ -10,11 +10,13 @@ import fractals.newlogic.drawing.color.TwoColorsColorizer;
 import fractals.newlogic.equations.EquationFactory;
 import fractals.newlogic.equations.JuliaEquationFactory;
 import fractals.newlogic.equations.MandelbrotEquationFactory;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 
 public class FractalViewController {
@@ -44,6 +46,9 @@ public class FractalViewController {
 	private Button drawButton;
 
 	@FXML
+	private TextField iterationsField;
+
+	@FXML
 	private void initialize() {
 		setChooser.setItems(FXCollections.observableArrayList(MANDELBROT_SET, JULIA_SET));
 		setChooser.getSelectionModel().selectFirst();
@@ -51,15 +56,27 @@ public class FractalViewController {
 		colorChooser.setItems(FXCollections.observableArrayList(TWO_COLORS, GRADIENT, ESCAPE));
 		colorChooser.getSelectionModel().selectFirst();
 
+		iterationsField.textProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+			if (!newValue.matches("\\d*")) {
+				iterationsField.setText(newValue.replaceAll("[^\\d]", ""));
+			}
+		});
+		iterationsField.setText("1000");
+
 		drawButton.setOnAction(e -> {
 			final long time = System.currentTimeMillis();
+
+			final long iterations = Long.parseLong(iterationsField.getText());
+
 			final String set = setChooser.getSelectionModel().getSelectedItem();
 			final String color = colorChooser.getSelectionModel().getSelectedItem();
 			final EquationFactory factory = factory(set);
 			final Colorizer colorizer = colorizer(color);
 			fractalCanvas.setWidth(fractalCanvas.getParent().getBoundsInLocal().getWidth());
 			fractalCanvas.setHeight(fractalCanvas.getParent().getBoundsInLocal().getHeight());
-			new FractalDrawer(colorizer, computingService, factory).draw(fractalCanvas.getGraphicsContext2D());
+			new FractalDrawer(colorizer, computingService, factory).draw(fractalCanvas.getGraphicsContext2D(),
+					iterations);
+
 			System.out.println("Overal: " + (System.currentTimeMillis() - time) + "ms.");
 		});
 	}

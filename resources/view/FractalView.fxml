@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
@@ -28,6 +29,9 @@
                         <Separator prefWidth="200.0" />
                         <Label text="Kolor" />
                         <ChoiceBox fx:id="colorChooser" prefHeight="25.0" prefWidth="197.0" />
+                        <Separator prefWidth="200.0" />
+                        <Label text="Liczba iteracji" />
+                        <TextField fx:id="iterationsField" />
                         <Separator prefWidth="200.0" />
                         <Button fx:id="drawButton" mnemonicParsing="false" text="Rysuj" />
                      </children>

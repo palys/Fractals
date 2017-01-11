@@ -27,10 +27,10 @@ public class FractalsWindowController {
 			final Colorizer v = new EscapeValueColorizer(Color.BLACK, Color.LIGHTGREY, 4);
 			final ComputingService computingService = new SingleThreadComputingService();
 			final FractalDrawer drawer = new FractalDrawer(v, computingService, new MandelbrotEquationFactory());
-			drawer.draw(mandelbrotCanvas.getGraphicsContext2D());
+			drawer.draw(mandelbrotCanvas.getGraphicsContext2D(), 1000);
 
 			final FractalDrawer drawerJ = new FractalDrawer(c, computingService, new MandelbrotEquationFactory());
-			drawerJ.draw(juliaCanvas.getGraphicsContext2D());
+			drawerJ.draw(juliaCanvas.getGraphicsContext2D(), 1000);
 		}).start();
 	}
 

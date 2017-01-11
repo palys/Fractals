@@ -26,7 +26,7 @@ public class FractalDrawer {
 		this.equationFactory = equationFactory;
 	}
 
-	public void draw(GraphicsContext ctx) {
+	public void draw(GraphicsContext ctx, long iterations) {
 
 		final long time = System.currentTimeMillis();
 		final Canvas canvas = ctx.getCanvas();
@@ -34,7 +34,7 @@ public class FractalDrawer {
 
 		final Map<IntPair, ComputedValue<FloatComplex>> values = computingService.computeValues(
 				FloatComplex.ofCannonical(-2, -2), FloatComplex.ofCannonical(2, 2),
-				FloatComplex.ofCannonical(0.5f, 0.3f), (int) canvas.getWidth(), (int) canvas.getHeight(), 1000,
+				FloatComplex.ofCannonical(0.5f, 0.3f), (int) canvas.getWidth(), (int) canvas.getHeight(), iterations,
 				equationFactory);
 
 		for (final Map.Entry<IntPair, ComputedValue<FloatComplex>> e : values.entrySet()) {
