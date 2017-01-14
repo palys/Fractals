@@ -9,6 +9,7 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane minHeight="300.0" minWidth="300.0" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fractals.view.FractalViewController">
@@ -33,7 +34,17 @@
                         <Label text="Liczba iteracji" />
                         <TextField fx:id="iterationsField" />
                         <Separator prefWidth="200.0" />
-                        <Button fx:id="drawButton" mnemonicParsing="false" text="Rysuj" />
+                        <Button fx:id="drawButton" defaultButton="true" mnemonicParsing="false" text="Rysuj" />
+                        <Separator prefWidth="200.0" />
+                        <Label text="Rozdzielczość" />
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <TextField fx:id="saveWidth" text="1024" />
+                              <Label text="x" />
+                              <TextField fx:id="saveHeight" text="1024" />
+                           </children>
+                        </HBox>
+                        <Button fx:id="saveButton" mnemonicParsing="false" text="Zapisz" />
                      </children>
                      <padding>
                         <Insets top="5.0" />
