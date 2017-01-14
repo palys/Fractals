@@ -7,6 +7,7 @@ import fractals.newlogic.drawing.color.Colorizer;
 import fractals.newlogic.drawing.color.EscapeValueColorizer;
 import fractals.newlogic.drawing.color.GradientColorizer;
 import fractals.newlogic.equations.MandelbrotEquationFactory;
+import fractals.newlogic.math.FloatComplex;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
@@ -27,10 +28,12 @@ public class FractalsWindowController {
 			final Colorizer v = new EscapeValueColorizer(Color.BLACK, Color.LIGHTGREY, 4);
 			final ComputingService computingService = new SingleThreadComputingService();
 			final FractalDrawer drawer = new FractalDrawer(v, computingService, new MandelbrotEquationFactory());
-			drawer.draw(mandelbrotCanvas.getGraphicsContext2D(), 1000);
+			drawer.draw(mandelbrotCanvas.getGraphicsContext2D(), 1000, FloatComplex.ofCannonical(0, 0),
+					FloatComplex.ofReal(3));
 
 			final FractalDrawer drawerJ = new FractalDrawer(c, computingService, new MandelbrotEquationFactory());
-			drawerJ.draw(juliaCanvas.getGraphicsContext2D(), 1000);
+			drawerJ.draw(juliaCanvas.getGraphicsContext2D(), 1000, FloatComplex.ofCannonical(0, 0),
+					FloatComplex.ofReal(3));
 		}).start();
 	}
 

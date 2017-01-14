@@ -10,6 +10,7 @@ import fractals.newlogic.drawing.color.TwoColorsColorizer;
 import fractals.newlogic.equations.EquationFactory;
 import fractals.newlogic.equations.JuliaEquationFactory;
 import fractals.newlogic.equations.MandelbrotEquationFactory;
+import fractals.newlogic.math.FloatComplex;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -75,7 +76,7 @@ public class FractalViewController {
 			fractalCanvas.setWidth(fractalCanvas.getParent().getBoundsInLocal().getWidth());
 			fractalCanvas.setHeight(fractalCanvas.getParent().getBoundsInLocal().getHeight());
 			new FractalDrawer(colorizer, computingService, factory).draw(fractalCanvas.getGraphicsContext2D(),
-					iterations);
+					iterations, FloatComplex.ofCannonical(-0.5f, 0), FloatComplex.ofReal(3));
 
 			System.out.println("Overal: " + (System.currentTimeMillis() - time) + "ms.");
 		});

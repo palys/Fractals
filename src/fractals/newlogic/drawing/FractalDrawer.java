@@ -6,6 +6,7 @@ import fractals.newlogic.computing.ComputedValue;
 import fractals.newlogic.computing.ComputingService;
 import fractals.newlogic.drawing.color.Colorizer;
 import fractals.newlogic.equations.EquationFactory;
+import fractals.newlogic.math.Complex;
 import fractals.newlogic.math.FloatComplex;
 import fractals.newlogic.math.IntPair;
 import javafx.scene.canvas.Canvas;
@@ -26,14 +27,16 @@ public class FractalDrawer {
 		this.equationFactory = equationFactory;
 	}
 
-	public void draw(GraphicsContext ctx, long iterations) {
+	public void draw(GraphicsContext ctx, long iterations, FloatComplex center, FloatComplex width) {
 
 		final long time = System.currentTimeMillis();
 		final Canvas canvas = ctx.getCanvas();
 		final PixelWriter writer = ctx.getPixelWriter();
 
-		final Map<IntPair, ComputedValue<FloatComplex>> values = computingService.computeValues(
-				FloatComplex.ofCannonical(-2, -2), FloatComplex.ofCannonical(2, 2),
+		final FloatComplex topLeft = topLeft(center, width, canvas.getWidth(), canvas.getHeight());
+		final FloatComplex bottomRight = bottomRight(center, topLeft);
+
+		final Map<IntPair, ComputedValue<FloatComplex>> values = computingService.computeValues(topLeft, bottomRight,
 				FloatComplex.ofCannonical(0.5f, 0.3f), (int) canvas.getWidth(), (int) canvas.getHeight(), iterations,
 				equationFactory);
 
@@ -41,5 +44,19 @@ public class FractalDrawer {
 			writer.setColor(e.getKey().x(), e.getKey().y(), colorizer.colorize(e.getValue()));
 		}
 		System.out.println("Drawing took: " + (System.currentTimeMillis() - time) + "ms.");// FIXME
+	}
+
+	private <C extends Complex<?, C>> FloatComplex topLeft(C center, C width, double canvasWidth, double canvasHeight) {
+		// FIXME any number not only double
+		final double left = center.real().doubleValue() - width.real().doubleValue() / 2;
+		final double density = width.real().doubleValue() / canvasWidth;
+		final double height = canvasHeight * density;
+		final double top = center.imaginary().doubleValue() + height / 2;
+		return FloatComplex.ofCannonical((float) left, (float) top);
+	}
+
+	private <C extends Complex<?, C>> C bottomRight(C center, C topLeft) {
+		final C diff = center.subtract(topLeft);
+		return center.add(diff);
 	}
 }
