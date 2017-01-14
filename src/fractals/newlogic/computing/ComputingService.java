@@ -1,6 +1,7 @@
 package fractals.newlogic.computing;
 
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import fractals.newlogic.equations.EquationFactory;
 import fractals.newlogic.math.Complex;
@@ -12,5 +13,6 @@ public interface ComputingService {
 			EquationFactory equationFactory);
 
 	<C extends Complex<?, C>> Map<IntPair, ComputedValue<C>> computeValues(C topLeft, C bottomRight, C center,
-			int width, int height, long maxIterations, EquationFactory equationFactory);
+			int width, int height, long maxIterations, EquationFactory equationFactory,
+			BiConsumer<Long, Long> progress);
 }

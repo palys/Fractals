@@ -19,10 +19,13 @@ import fractals.newlogic.equations.MandelbrotEquationFactory;
 import fractals.newlogic.math.FloatComplex;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -31,6 +34,9 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class FractalViewController {
 
@@ -130,9 +136,47 @@ public class FractalViewController {
 		fractalCanvas.setWidth(((AnchorPane) fractalCanvas.getParent()).getWidth());
 		fractalCanvas.setHeight(((AnchorPane) fractalCanvas.getParent()).getHeight());
 		drawer = new FractalDrawer(colorizer, computingService, factory);
-		drawer.draw(fractalCanvas.getGraphicsContext2D(), iterations, center, width);
+
+		// final ProgressBar ind = new ProgressBar();
+		// final Stage stage = new Stage();
+		// stage.setAlwaysOnTop(true);
+		// stage.initStyle(StageStyle.UNDECORATED);
+		// stage.setResizable(false);
+		// stage.initModality(Modality.APPLICATION_MODAL);
+		// final BorderPane layout = new BorderPane();
+		// final Scene sc = new Scene(layout);
+		// layout.setCenter(ind);
+		// stage.setScene(sc);
+		// stage.show();
+		try {
+			final Task<Void> task = drawer.draw(fractalCanvas.getGraphicsContext2D(), iterations, center, width);
+			final ProgressBarController progressBarController = showProgressBar();
+			task.setOnSucceeded(v -> progressBarController.destroy());
+			progressBarController.bindProgressProperty(task.progressProperty());
+		} catch (final IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		System.out.println("Overal: " + (System.currentTimeMillis() - time) + "ms.");
+	}
+
+	private ProgressBarController showProgressBar() throws IOException {
+		final FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(Main.class.getResource("/view/ProgressLayout.fxml"));
+		final AnchorPane anchorPane = (AnchorPane) loader.load();
+
+		final Stage stage = new Stage();
+		stage.setAlwaysOnTop(true);
+		stage.initStyle(StageStyle.UNDECORATED);
+		stage.setResizable(false);
+		stage.initModality(Modality.APPLICATION_MODAL);
+
+		final Scene sc = new Scene(anchorPane);
+		stage.setScene(sc);
+		stage.show();
+
+		return loader.getController();
 	}
 
 	private void configureAsNumericField(TextField field) {

@@ -9,6 +9,8 @@ import fractals.newlogic.equations.EquationFactory;
 import fractals.newlogic.math.Complex;
 import fractals.newlogic.math.FloatComplex;
 import fractals.newlogic.math.IntPair;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelWriter;
@@ -27,23 +29,41 @@ public class FractalDrawer {
 		this.equationFactory = equationFactory;
 	}
 
-	public void draw(GraphicsContext ctx, long iterations, FloatComplex center, FloatComplex width) {
+	public Task<Void> draw(GraphicsContext ctx, long iterations, FloatComplex center, FloatComplex width) {
+		final Task<Void> task = new Task<Void>() {
 
-		final long time = System.currentTimeMillis();
-		final Canvas canvas = ctx.getCanvas();
-		final PixelWriter writer = ctx.getPixelWriter();
+			@Override
+			protected Void call() throws Exception {
+				final long time = System.currentTimeMillis();
+				final Canvas canvas = ctx.getCanvas();
+				final PixelWriter writer = ctx.getPixelWriter();
 
-		final FloatComplex topLeft = topLeft(center, width, canvas.getWidth(), canvas.getHeight());
-		final FloatComplex bottomRight = bottomRight(center, topLeft);
+				final FloatComplex topLeft = topLeft(center, width, canvas.getWidth(), canvas.getHeight());
+				final FloatComplex bottomRight = bottomRight(center, topLeft);
 
-		final Map<IntPair, ComputedValue<FloatComplex>> values = computingService.computeValues(topLeft, bottomRight,
-				FloatComplex.ofCannonical(0.5f, 0.3f), (int) canvas.getWidth(), (int) canvas.getHeight(), iterations,
-				equationFactory);
+				final Map<IntPair, ComputedValue<FloatComplex>> values = computingService.computeValues(topLeft,
+						bottomRight, FloatComplex.ofCannonical(0.5f, 0.3f), (int) canvas.getWidth(),
+						(int) canvas.getHeight(), iterations, equationFactory, (e, o) -> updateProgress(e, o));
 
-		for (final Map.Entry<IntPair, ComputedValue<FloatComplex>> e : values.entrySet()) {
-			writer.setColor(e.getKey().x(), e.getKey().y(), colorizer.colorize(e.getValue()));
-		}
-		System.out.println("Drawing took: " + (System.currentTimeMillis() - time) + "ms.");// FIXME
+				Platform.runLater(() -> {
+					final int overal = values.size();
+					int i = 0;
+					for (final Map.Entry<IntPair, ComputedValue<FloatComplex>> e : values.entrySet()) {
+						writer.setColor(e.getKey().x(), e.getKey().y(), colorizer.colorize(e.getValue()));
+						i++;
+						updateProgress(i, overal);
+					}
+					System.out.println("Drawing took: " + (System.currentTimeMillis() - time) + "ms.");// FIXME
+				});
+				return null;
+			}
+		};
+
+		final Thread th = new Thread(task);
+		th.setDaemon(true);
+		th.start();
+
+		return task;
 	}
 
 	private <C extends Complex<?, C>> FloatComplex topLeft(C center, C width, double canvasWidth, double canvasHeight) {
