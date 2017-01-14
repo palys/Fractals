@@ -11,18 +11,18 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fractals.view.FractalViewController">
+<AnchorPane minHeight="300.0" minWidth="300.0" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fractals.view.FractalViewController">
    <children>
-      <SplitPane dividerPositions="0.8" prefHeight="600.0" prefWidth="1000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane dividerPositions="0.8" minHeight="100.0" minWidth="300.0" prefHeight="600.0" prefWidth="1000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
-          <AnchorPane>
+          <AnchorPane minHeight="100.0" minWidth="100.0">
                <children>
-                  <Canvas fx:id="fractalCanvas" height="598.0" width="795.0" />
+                  <Canvas fx:id="fractalCanvas" height="100.0" width="100.0" />
                </children>
             </AnchorPane>
-          <AnchorPane>
+          <AnchorPane maxWidth="200.0" minHeight="200.0" minWidth="200.0" prefWidth="200.0" SplitPane.resizableWithParent="false">
                <children>
-                  <VBox prefHeight="598.0" prefWidth="197.0" spacing="10.0">
+                  <VBox minHeight="200.0" minWidth="200.0" prefHeight="200.0" prefWidth="197.0" spacing="10.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Label text="Zbiór" />
                         <ChoiceBox fx:id="setChooser" prefHeight="25.0" prefWidth="197.0" />

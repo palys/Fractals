@@ -18,6 +18,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 
 public class FractalViewController {
@@ -73,8 +74,8 @@ public class FractalViewController {
 			final String color = colorChooser.getSelectionModel().getSelectedItem();
 			final EquationFactory factory = factory(set);
 			final Colorizer colorizer = colorizer(color);
-			fractalCanvas.setWidth(fractalCanvas.getParent().getBoundsInLocal().getWidth());
-			fractalCanvas.setHeight(fractalCanvas.getParent().getBoundsInLocal().getHeight());
+			fractalCanvas.setWidth(((AnchorPane) fractalCanvas.getParent()).getWidth());
+			fractalCanvas.setHeight(((AnchorPane) fractalCanvas.getParent()).getHeight());
 			new FractalDrawer(colorizer, computingService, factory).draw(fractalCanvas.getGraphicsContext2D(),
 					iterations, FloatComplex.ofCannonical(-0.5f, 0), FloatComplex.ofReal(3));
 

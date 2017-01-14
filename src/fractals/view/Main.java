@@ -33,6 +33,8 @@ public class Main extends Application {
 
 			// Show the scene containing the root layout.
 			final Scene scene = new Scene(rootLayout);
+			primaryStage.setMinHeight(450);
+			primaryStage.setMinWidth(450);
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch (final IOException e) {
