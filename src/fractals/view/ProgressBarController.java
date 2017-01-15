@@ -19,9 +19,6 @@ public class ProgressBarController {
 	}
 
 	public void bindProgressProperty(ReadOnlyDoubleProperty progressProperty) {
-		// progressProperty.addListener((observable, oldValue, newValue) -> {
-		// progressBar.setProgress(newValue.doubleValue());
-		// });
 		progressBar.progressProperty().bind(progressProperty);
 	}
 }

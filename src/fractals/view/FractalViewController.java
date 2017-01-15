@@ -20,6 +20,7 @@ import fractals.newlogic.math.FloatComplex;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -113,14 +114,27 @@ public class FractalViewController {
 				final int height = Integer.parseInt(saveHeight.getText());
 				final WritableImage writebleImage = new WritableImage(width, height);
 				final Canvas canvas = new Canvas(width, height);
-				drawer.draw(canvas.getGraphicsContext2D(), Long.parseLong(iterationsField.getText()), center,
-						this.width);
-				canvas.snapshot(null, writebleImage);
-				final RenderedImage renderedImage = SwingFXUtils.fromFXImage(writebleImage, null);
-				ImageIO.write(renderedImage, "png", file);
-			} catch (final IOException ex) {
-				ex.printStackTrace();
+				final Task<Void> task = drawer.draw(canvas.getGraphicsContext2D(),
+						Long.parseLong(iterationsField.getText()), center, this.width);
+				showProgressBar(task);
+				task.stateProperty().addListener((observable, oldValue, newValue) -> {
+					if (newValue == Worker.State.SUCCEEDED && oldValue != Worker.State.SUCCEEDED) {
+						canvas.snapshot(null, writebleImage);
+						final RenderedImage renderedImage = SwingFXUtils.fromFXImage(writebleImage, null);
+						try {
+							ImageIO.write(renderedImage, "png", file);
+						} catch (final Exception e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+
+				});
+			} catch (final IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
+
 		}
 	}
 
@@ -137,22 +151,9 @@ public class FractalViewController {
 		fractalCanvas.setHeight(((AnchorPane) fractalCanvas.getParent()).getHeight());
 		drawer = new FractalDrawer(colorizer, computingService, factory);
 
-		// final ProgressBar ind = new ProgressBar();
-		// final Stage stage = new Stage();
-		// stage.setAlwaysOnTop(true);
-		// stage.initStyle(StageStyle.UNDECORATED);
-		// stage.setResizable(false);
-		// stage.initModality(Modality.APPLICATION_MODAL);
-		// final BorderPane layout = new BorderPane();
-		// final Scene sc = new Scene(layout);
-		// layout.setCenter(ind);
-		// stage.setScene(sc);
-		// stage.show();
 		try {
 			final Task<Void> task = drawer.draw(fractalCanvas.getGraphicsContext2D(), iterations, center, width);
-			final ProgressBarController progressBarController = showProgressBar();
-			task.setOnSucceeded(v -> progressBarController.destroy());
-			progressBarController.bindProgressProperty(task.progressProperty());
+			showProgressBar(task);
 		} catch (final IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -161,7 +162,7 @@ public class FractalViewController {
 		System.out.println("Overal: " + (System.currentTimeMillis() - time) + "ms.");
 	}
 
-	private ProgressBarController showProgressBar() throws IOException {
+	private void showProgressBar(Task<Void> task) throws IOException {
 		final FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(Main.class.getResource("/view/ProgressLayout.fxml"));
 		final AnchorPane anchorPane = (AnchorPane) loader.load();
@@ -176,7 +177,9 @@ public class FractalViewController {
 		stage.setScene(sc);
 		stage.show();
 
-		return loader.getController();
+		final ProgressBarController controller = loader.getController();
+		task.setOnSucceeded(v -> controller.destroy());
+		controller.bindProgressProperty(task.progressProperty());
 	}
 
 	private void configureAsNumericField(TextField field) {

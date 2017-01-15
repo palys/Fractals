@@ -23,6 +23,43 @@ public class FractalDrawer {
 
 	private final EquationFactory equationFactory;
 
+	private class DrawingTask extends Task<Void> {
+
+		private final GraphicsContext ctx;
+
+		private final FloatComplex topLeft;
+
+		private final FloatComplex bottomRight;
+
+		private final long iterations;
+
+		private DrawingTask(GraphicsContext ctx, FloatComplex topLeft, FloatComplex bottomRight, long iterations) {
+			this.ctx = ctx;
+			this.topLeft = topLeft;
+			this.bottomRight = bottomRight;
+			this.iterations = iterations;
+		}
+
+		@Override
+		protected Void call() throws Exception {
+			final long time = System.currentTimeMillis();
+			final Canvas canvas = ctx.getCanvas();
+			final PixelWriter writer = ctx.getPixelWriter();
+
+			final Map<IntPair, ComputedValue<FloatComplex>> values = computingService.computeValues(topLeft,
+					bottomRight, FloatComplex.ofCannonical(0.5f, 0.3f), (int) canvas.getWidth(),
+					(int) canvas.getHeight(), iterations, equationFactory, (e, o) -> updateProgress(e, o));
+
+			Platform.runLater(() -> {
+				for (final Map.Entry<IntPair, ComputedValue<FloatComplex>> e : values.entrySet()) {
+					writer.setColor(e.getKey().x(), e.getKey().y(), colorizer.colorize(e.getValue()));
+				}
+				System.out.println("Drawing took: " + (System.currentTimeMillis() - time) + "ms.");// FIXME
+			});
+			return null;
+		}
+	}
+
 	public FractalDrawer(Colorizer colorizer, ComputingService computingService, EquationFactory equationFactory) {
 		this.colorizer = colorizer;
 		this.computingService = computingService;
@@ -30,34 +67,11 @@ public class FractalDrawer {
 	}
 
 	public Task<Void> draw(GraphicsContext ctx, long iterations, FloatComplex center, FloatComplex width) {
-		final Task<Void> task = new Task<Void>() {
+		final Canvas canvas = ctx.getCanvas();
+		final FloatComplex topLeft = topLeft(center, width, canvas.getWidth(), canvas.getHeight());
+		final FloatComplex bottomRight = bottomRight(center, topLeft);
 
-			@Override
-			protected Void call() throws Exception {
-				final long time = System.currentTimeMillis();
-				final Canvas canvas = ctx.getCanvas();
-				final PixelWriter writer = ctx.getPixelWriter();
-
-				final FloatComplex topLeft = topLeft(center, width, canvas.getWidth(), canvas.getHeight());
-				final FloatComplex bottomRight = bottomRight(center, topLeft);
-
-				final Map<IntPair, ComputedValue<FloatComplex>> values = computingService.computeValues(topLeft,
-						bottomRight, FloatComplex.ofCannonical(0.5f, 0.3f), (int) canvas.getWidth(),
-						(int) canvas.getHeight(), iterations, equationFactory, (e, o) -> updateProgress(e, o));
-
-				Platform.runLater(() -> {
-					final int overal = values.size();
-					int i = 0;
-					for (final Map.Entry<IntPair, ComputedValue<FloatComplex>> e : values.entrySet()) {
-						writer.setColor(e.getKey().x(), e.getKey().y(), colorizer.colorize(e.getValue()));
-						i++;
-						updateProgress(i, overal);
-					}
-					System.out.println("Drawing took: " + (System.currentTimeMillis() - time) + "ms.");// FIXME
-				});
-				return null;
-			}
-		};
+		final Task<Void> task = new DrawingTask(ctx, topLeft, bottomRight, iterations);
 
 		final Thread th = new Thread(task);
 		th.setDaemon(true);

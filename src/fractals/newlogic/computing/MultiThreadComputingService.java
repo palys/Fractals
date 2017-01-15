@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -93,7 +94,8 @@ public class MultiThreadComputingService implements ComputingService {
 
 	@Override
 	public <C extends Complex<?, C>> Map<IntPair, ComputedValue<C>> computeValues(C topLeft, C bottomRight, C center,
-			int width, int height, long maxIterations, EquationFactory equationFactory) {
+			int width, int height, long maxIterations, EquationFactory equationFactory,
+			BiConsumer<Long, Long> progress) {
 		final long time = System.currentTimeMillis();// FIXME
 		final double rStep = 1.0 / width;
 		final double iStep = 1.0 / height;
